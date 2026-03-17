@@ -8,9 +8,11 @@ namespace _10._1Ser_DeSer
         {
             string jsonpath = @"D:\MSSA\20483\Wk10\10-1json.txt";
             string xmlpath = @"D:\MSSA\20483\Wk10\10-1xml.xml";
+            string binarypath = @"D:\MSSA\20483\Wk10\10-1binary.dat";
 
             Phone p1 = new Phone("apple", "12 pro", 899.99f);
             Phone p2 = new Phone("samsung", "galaxy s19", 799.99f);
+            Phone p3 = new Phone("google", "pixel", 999.99f);
 
             JSONSerialize(p1, jsonpath);
             JSONDeSerialize(jsonpath);
@@ -18,6 +20,10 @@ namespace _10._1Ser_DeSer
             Console.WriteLine();
             XMLSerialize(p2, xmlpath);
             XMLDeSerialize(xmlpath);
+
+            Console.WriteLine();
+            BinarySerialize(p3, binarypath);
+            BinaryDeserialize(binarypath);
         }
 
         static void JSONSerialize(Phone phone, string jsonpath)
@@ -67,6 +73,43 @@ namespace _10._1Ser_DeSer
             var obj = (Phone)xmlSerializer.Deserialize(fs);
             fs.Close();
             Console.WriteLine($"Deserialized XML: {obj.Brand}, {obj.Model}, {obj.Price}" );
+        }
+
+        static void BinarySerialize(Phone phone, string binaryPath)
+        {
+            if (File.Exists(binaryPath))
+            {
+                File.Delete(binaryPath);
+            }
+            FileStream fs = new FileStream(binaryPath, FileMode.CreateNew, FileAccess.Write);
+            BinaryWriter writer = new BinaryWriter(fs);
+            Console.WriteLine("Serializing to Binary...");
+            writer.Write(phone.Brand);
+            writer.Write(phone.Model);
+            writer.Write(phone.Price);
+            writer.Close();
+            fs.Close();
+            
+        }
+
+        static void BinaryDeserialize(string binaryPath)
+        {
+            FileStream fs = new FileStream(binaryPath, FileMode.Open, FileAccess.Read);
+            BinaryReader binaryReader = new BinaryReader(fs);
+            Console.WriteLine("Deserializing from Binary...");
+
+            string brand = binaryReader.ReadString();
+            string model = binaryReader.ReadString();
+            float price = binaryReader.ReadSingle();
+
+            Phone obj = new Phone(brand, model, price);
+
+            binaryReader.Close();
+            fs.Close();
+
+            Console.WriteLine("Brand: " + obj.Brand);
+            Console.WriteLine("Model: " + obj.Model);
+            Console.WriteLine("Price: " + obj.Price);
         }
     }
 }
